@@ -1,0 +1,10 @@
+﻿<Application x:Class="ConventionDataTemplateSelectorDemo.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:ConventionDataTemplateSelectorDemo" StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <local:ConventionDataTemplateSelector x:Key="ConventionDataTemplateSelector" />
+
+        <Style TargetType="ContentControl">
+            <Setter Property="ContentTemplateSelector" Value="{StaticResource ConventionDataTemplateSelector}" />
+        </Style>
+    </Application.Resources>
+</Application>
