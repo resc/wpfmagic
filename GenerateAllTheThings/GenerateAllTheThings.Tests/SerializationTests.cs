@@ -27,16 +27,16 @@ namespace GenerateAllTheThings.Tests
                 Console.WriteLine(sw.ToString());
                 using (var sr = new StringReader(sw.ToString()))
                 {
-                    var deserializedEmail = (SendEmail) ser.Deserialize(sr);
+                    var deserializedEmail = (SendEmail)ser.Deserialize(sr);
 
-                    Assert.AreEqual(sendEmail.TimeStamp,deserializedEmail.TimeStamp);
+                    Assert.AreEqual(sendEmail.TimeStamp, deserializedEmail.TimeStamp);
                 }
             }
 
 
 
         }
-    
+
         [TestMethod]
         public void CanSerializeOpenPortinFireWall()
         {
@@ -45,9 +45,9 @@ namespace GenerateAllTheThings.Tests
                 timeStamp: DateTime.Now,
                 returnAddress: "non@example.com",
                 topic: "emailsender",
-                routerName:"my.router",
-                port:1234,
-                revertToClosedAfter:null);
+                routerName: "my.router",
+                port: 1234,
+                revertToClosedAfter: null);
 
             using (var sw = new StringWriter())
             {
@@ -55,16 +55,17 @@ namespace GenerateAllTheThings.Tests
                 Console.WriteLine(sw.ToString());
                 using (var sr = new StringReader(sw.ToString()))
                 {
-                    var deserializedOpenPort = (OpenPortInFirewall) ser.Deserialize(sr);
+                    var deserializedOpenPort = (OpenPortInFirewall)ser.Deserialize(sr);
 
-                    Assert.AreEqual(openPort.TimeStamp,deserializedOpenPort.TimeStamp);
-                    Assert.AreEqual(openPort.RevertToClosedAfter,deserializedOpenPort.RevertToClosedAfter);
+                    Assert.AreEqual(openPort.TimeStamp, deserializedOpenPort.TimeStamp);
+                    Assert.AreEqual(openPort.RevertToClosedAfter, deserializedOpenPort.RevertToClosedAfter);
                 }
             }
 
 
 
         }
+
         [TestMethod]
         public void CanSerializeOpenPortinFireWallWithRevertTime()
         {
@@ -73,9 +74,9 @@ namespace GenerateAllTheThings.Tests
                 timeStamp: DateTime.Now,
                 returnAddress: "non@example.com",
                 topic: "emailsender",
-                routerName:"my.router",
-                port:1234,
-                revertToClosedAfter:TimeSpan.FromDays(1)-DateTime.Now.TimeOfDay);
+                routerName: "my.router",
+                port: 1234,
+                revertToClosedAfter: TimeSpan.FromDays(1) - DateTime.Now.TimeOfDay);
 
             using (var sw = new StringWriter())
             {
@@ -83,15 +84,42 @@ namespace GenerateAllTheThings.Tests
                 Console.WriteLine(sw.ToString());
                 using (var sr = new StringReader(sw.ToString()))
                 {
-                    var deserializedOpenPort = (OpenPortInFirewall) ser.Deserialize(sr);
+                    var deserializedOpenPort = (OpenPortInFirewall)ser.Deserialize(sr);
 
-                    Assert.AreEqual(openPort.TimeStamp,deserializedOpenPort.TimeStamp);
-                    Assert.AreEqual(openPort.RevertToClosedAfter,deserializedOpenPort.RevertToClosedAfter);
+                    Assert.AreEqual(openPort.TimeStamp, deserializedOpenPort.TimeStamp);
+                    Assert.AreEqual(openPort.RevertToClosedAfter, deserializedOpenPort.RevertToClosedAfter);
                 }
             }
+        }
 
+        [TestMethod]
+        public void CanSerializeArray()
+        {
+            var ser = new XmlSerializer(typeof(OpenPortInFirewall[]));
+            var openPort = new OpenPortInFirewall(
+                timeStamp: DateTime.Now,
+                returnAddress: "non@example.com",
+                topic: "emailsender",
+                routerName: "my.router",
+                port: 1234,
+                revertToClosedAfter: TimeSpan.FromDays(1) - DateTime.Now.TimeOfDay);
+            var openPort2 = new OpenPortInFirewall(
+                timeStamp: DateTime.Now,
+                returnAddress: "non@example.com",
+                topic: "emailsender",
+                routerName: "my.router",
+                port: 4321,
+                revertToClosedAfter: TimeSpan.FromDays(1) - DateTime.Now.TimeOfDay);
 
-
+            using (var sw = new StringWriter())
+            {
+                ser.Serialize(sw, new[] { openPort, openPort2 });
+                Console.WriteLine(sw.ToString());
+                using (var sr = new StringReader(sw.ToString()))
+                {
+                    var deserializedOpenPort = (OpenPortInFirewall[])ser.Deserialize(sr);
+                }
+            }
         }
     }
 }

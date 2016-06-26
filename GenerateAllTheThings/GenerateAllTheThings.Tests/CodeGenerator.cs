@@ -163,6 +163,7 @@ namespace GenerateAllTheThings.Tests
                         w.WriteLine($"{p.Name} = {typeName}.Parse(r.Value, CultureInfo.InvariantCulture);");
                     }
                 }
+                w.WriteLine("if (r.MoveToContent() == XmlNodeType.Element) r.Read();");
             }
         }
 

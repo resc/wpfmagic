@@ -52,6 +52,7 @@ namespace GenerateAllTheThings.Data
             Topic = r.Value;
             r.MoveToAttribute("TimeStamp");
             TimeStamp = DateTime.Parse(r.Value, CultureInfo.InvariantCulture);
+            if (r.MoveToContent() == XmlNodeType.Element) r.Read();
         }
         /// <summary> explicit implementation of IXmlSerializable.WriteXml </summary>
         void IXmlSerializable.WriteXml(XmlWriter w)
