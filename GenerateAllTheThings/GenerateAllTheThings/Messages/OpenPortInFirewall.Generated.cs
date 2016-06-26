@@ -64,5 +64,9 @@ namespace GenerateAllTheThings.Data
             w.WriteAttributeString("Topic", Topic);
             w.WriteAttributeString("TimeStamp", TimeStamp.ToString("O"));
         }
+        public override string ToString()
+        {
+            return $"RouterName: {RouterName}, Port: {Port}, RevertToClosedAfter: {RevertToClosedAfter}, ReturnAddress: {ReturnAddress}, Topic: {Topic}, TimeStamp: {TimeStamp}";
+        }
     }
 }

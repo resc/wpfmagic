@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -80,6 +81,8 @@ namespace GenerateAllTheThings.Tests
                         }
 
                         ImplementIXmlSerializable(w, properties);
+
+                        ImplementToString(w, properties);
                     }
                 }
             }
@@ -174,6 +177,23 @@ namespace GenerateAllTheThings.Tests
             using (w.Block())
             {
                 w.WriteLine("return null;");
+            }
+        }
+
+        private static void ImplementToString(CodeWriter w, IList<PropertyInfo> props)
+        {
+            w.WriteLine("public override string ToString()");
+            using (w.Block())
+            {
+                w.Write("return $\"");
+                for (int index = 0; index < props.Count; index++)
+                {
+                    var p = props[index];
+                    w.Write($"{p.Name}: {{{p.Name}}}");
+                    if (index != props.Count - 1)
+                        w.Write(", ");
+                }
+                w.WriteLine("\";");
             }
         }
 

@@ -61,5 +61,9 @@ namespace GenerateAllTheThings.Data
             w.WriteAttributeString("Topic", Topic);
             w.WriteAttributeString("TimeStamp", TimeStamp.ToString("O"));
         }
+        public override string ToString()
+        {
+            return $"To: {To}, Cc: {Cc}, Bcc: {Bcc}, Body: {Body}, ReturnAddress: {ReturnAddress}, Topic: {Topic}, TimeStamp: {TimeStamp}";
+        }
     }
 }
