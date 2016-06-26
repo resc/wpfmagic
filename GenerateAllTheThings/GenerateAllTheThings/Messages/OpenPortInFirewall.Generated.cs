@@ -11,17 +11,16 @@ using System.Xml.Serialization;
 namespace GenerateAllTheThings.Data
 {
     [Serializable]
-    public partial class SendEmail : IXmlSerializable
+    public partial class OpenPortInFirewall : IXmlSerializable
     {
-        public SendEmail()
+        public OpenPortInFirewall()
         {
         }
-        public SendEmail(string to, string cc, string bcc, string body, string returnAddress, string topic, DateTime timeStamp)
+        public OpenPortInFirewall(string routerName, int port, TimeSpan? revertToClosedAfter, string returnAddress, string topic, DateTime timeStamp)
         {
-            To = to;
-            Cc = cc;
-            Bcc = bcc;
-            Body = body;
+            RouterName = routerName;
+            Port = port;
+            RevertToClosedAfter = revertToClosedAfter;
             ReturnAddress = returnAddress;
             Topic = topic;
             TimeStamp = timeStamp;
@@ -34,14 +33,19 @@ namespace GenerateAllTheThings.Data
         /// <summary> explicit implementation of IXmlSerializable.ReadXml </summary>
         void IXmlSerializable.ReadXml(XmlReader r)
         {
-            r.MoveToAttribute("To");
-            To = r.Value;
-            r.MoveToAttribute("Cc");
-            Cc = r.Value;
-            r.MoveToAttribute("Bcc");
-            Bcc = r.Value;
-            r.MoveToAttribute("Body");
-            Body = r.Value;
+            r.MoveToAttribute("RouterName");
+            RouterName = r.Value;
+            r.MoveToAttribute("Port");
+            Port = int.Parse(r.Value, CultureInfo.InvariantCulture);
+            r.MoveToAttribute("RevertToClosedAfter");
+            if (r.Value == "null")
+            {
+                RevertToClosedAfter = null;
+            }
+            else
+            {
+                RevertToClosedAfter = TimeSpan.Parse(r.Value, CultureInfo.InvariantCulture);
+            }
             r.MoveToAttribute("ReturnAddress");
             ReturnAddress = r.Value;
             r.MoveToAttribute("Topic");
@@ -52,10 +56,9 @@ namespace GenerateAllTheThings.Data
         /// <summary> explicit implementation of IXmlSerializable.WriteXml </summary>
         void IXmlSerializable.WriteXml(XmlWriter w)
         {
-            w.WriteAttributeString("To", To);
-            w.WriteAttributeString("Cc", Cc);
-            w.WriteAttributeString("Bcc", Bcc);
-            w.WriteAttributeString("Body", Body);
+            w.WriteAttributeString("RouterName", RouterName);
+            w.WriteAttributeString("Port", string.Format(CultureInfo.InvariantCulture,"{0}", Port));
+            w.WriteAttributeString("RevertToClosedAfter", RevertToClosedAfter == null ? "null" : string.Format(CultureInfo.InvariantCulture, "{0}", RevertToClosedAfter));
             w.WriteAttributeString("ReturnAddress", ReturnAddress);
             w.WriteAttributeString("Topic", Topic);
             w.WriteAttributeString("TimeStamp", TimeStamp.ToString("O"));

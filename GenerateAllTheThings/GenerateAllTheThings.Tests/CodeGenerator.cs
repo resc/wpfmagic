@@ -71,7 +71,7 @@ namespace GenerateAllTheThings.Tests
 
                         // constructor with parameters for all properties
                         w.Write($"public {t.Name}(");
-                        w.Write(string.Join(", ", properties.Select(p => p.PropertyType.SourceCodeName()+ " " + ParamNameFor(p))));
+                        w.Write(string.Join(", ", properties.Select(p => p.PropertyType.SourceCodeName() + " " + ParamNameFor(p))));
                         w.WriteLine(")");
                         using (w.Block())
                         {
@@ -111,6 +111,10 @@ namespace GenerateAllTheThings.Tests
                     {
                         w.WriteLine($"w.WriteAttributeString(\"{p.Name}\", {p.Name});");
                     }
+                    else if (p.PropertyType == typeof(DateTime))
+                    {
+                        w.WriteLine($"w.WriteAttributeString(\"{p.Name}\", {p.Name}.ToString(\"O\"));");
+                    }
                     else
                     {
                         w.WriteLine($"w.WriteAttributeString(\"{p.Name}\", string.Format(CultureInfo.InvariantCulture,\"{{0}}\", {p.Name}));");
@@ -125,49 +129,38 @@ namespace GenerateAllTheThings.Tests
             w.WriteLine($"void {nameof(IXmlSerializable)}.{nameof(IXmlSerializable.ReadXml)}({nameof(XmlReader)} r)");
             using (w.Block())
             {
-                w.WriteLine("while (r.ReadAttributeValue())");
-                using (w.Block())
+                foreach (var p in properties)
                 {
-                    w.WriteLine("switch (r.Name)");
-                    using (w.Block())
+                    w.WriteLine($"r.MoveToAttribute(\"{p.Name}\");");
+
+                    if (p.PropertyType.IsNullable())
                     {
-                        foreach (var p in properties)
+                        var typeName = p.PropertyType.SourceCodeName();
+                        if (p.PropertyType.IsNullable())
                         {
-                            w.WriteLine($"case \"{p.Name}\":");
-                            using (w.Block())
-                            {
-                                if (p.PropertyType.IsNullable())
-                                {
-                                    var typeName = p.PropertyType.SourceCodeName();
-                                    if (p.PropertyType.IsNullable())
-                                    {
-                                        typeName = p.PropertyType.GetGenericArguments()[0].SourceCodeName();
-                                    }
-
-                                    w.WriteLine($"if (r.Value == \"null\")");
-                                    using (w.Block())
-                                        w.WriteLine($"{p.Name} = null;");
-                                    w.WriteLine("else");
-                                    using (w.Block())
-                                        w.WriteLine($"{p.Name} = {typeName}.Parse(r.Value, CultureInfo.InvariantCulture);");
-                                }
-                                else if (p.PropertyType == typeof(string))
-                                {
-                                    w.WriteLine($"{p.Name} = r.Value;");
-                                }
-                                else
-                                {
-                                    var typeName = p.PropertyType.SourceCodeName();
-                                    if (p.PropertyType.IsNullable())
-                                    {
-                                        typeName = p.PropertyType.GetGenericArguments()[0].SourceCodeName();
-                                    }
-
-                                    w.WriteLine($"{p.Name} = {typeName}.Parse(r.Value, CultureInfo.InvariantCulture);");
-                                }
-                                w.WriteLine("break;");
-                            }
+                            typeName = p.PropertyType.GetGenericArguments()[0].SourceCodeName();
                         }
+
+                        w.WriteLine($"if (r.Value == \"null\")");
+                        using (w.Block())
+                            w.WriteLine($"{p.Name} = null;");
+                        w.WriteLine("else");
+                        using (w.Block())
+                            w.WriteLine($"{p.Name} = {typeName}.Parse(r.Value, CultureInfo.InvariantCulture);");
+                    }
+                    else if (p.PropertyType == typeof(string))
+                    {
+                        w.WriteLine($"{p.Name} = r.Value;");
+                    }
+                    else
+                    {
+                        var typeName = p.PropertyType.SourceCodeName();
+                        if (p.PropertyType.IsNullable())
+                        {
+                            typeName = p.PropertyType.GetGenericArguments()[0].SourceCodeName();
+                        }
+
+                        w.WriteLine($"{p.Name} = {typeName}.Parse(r.Value, CultureInfo.InvariantCulture);");
                     }
                 }
             }
